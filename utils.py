@@ -43,7 +43,7 @@ def get_adjusted_close(symbols, dates=dates):
 
 
 def normalize(df):
-    return df / df.ix[0, :]
+    return df / df.iloc[0, :]
 
 
 def get_bollinger_bands(rm, rstd):
@@ -54,11 +54,11 @@ def get_bollinger_bands(rm, rstd):
 
 def get_daily_returns(df):
     dr = df.copy()
-    dr.ix[1:] = df / df.shift(1) - 1
+    dr.iloc[1:] = df / df.shift(1) - 1
     if len(dr.axes) == 1:
-        dr.ix[0] = 0
+        dr.iloc[0] = 0
     else:
-        dr.ix[0, :] = 0
+        dr.iloc[0, :] = 0
     return dr
 
 
@@ -87,7 +87,7 @@ def port_objective(allocs, normed, start_val):
     pos_vals = alloced * start_val
     port_val = pos_vals.sum(axis=1)
     daily_returns = get_daily_returns(port_val)
-    daily_returns = daily_returns.ix[1:]
+    daily_returns = daily_returns.iloc[1:]
     return (-get_sharpe_ratio(daily_returns))
 
 
@@ -111,10 +111,10 @@ def test_run():
     symbols = ['SPY', 'AMZN', 'GOOG']
 
     df = get_adjusted_close(symbols, dates)
-    # print df.ix['2010-01-01':'2010-01-31']
+    # print df.iloc['2010-01-01':'2010-01-31']
     # print df['GOOG']
     # print df[['IBM', 'GLD']]
-    # print df.ix['2010-03-10':'2010-03-15', 	['SPY', 'IBM']]
+    # print df.iloc['2010-03-10':'2010-03-15', 	['SPY', 'IBM']]
     # ax = df.plot()
 
     # print df.mean()
