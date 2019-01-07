@@ -10,34 +10,26 @@ class Action:
     SELL = 'SELL'
     ACTIONS = [EMPTY, HOLD, BUY, SELL]
 
-
 """
 Baseline strategy class will buy once at the beginning and sell at the end
 """
 class Strategy:
-    def __init__(self, stock_data):
-        self.stock_data = stock_data
-        index = pd.MultiIndex.from_product([self.stock_data.adj_close.index, self.stock_data.adj_close.columns.values], names=['Date', 'Stock'])
-        size = index.size
-
-        action_series = pd.Series([Action.EMPTY]*size, index=index, dtype=pd.api.types.CategoricalDtype(categories=Action.ACTIONS))
-        quantity_series = pd.Series([0]*size, index=index, dtype='int')
-
-        self.actions = pd.DataFrame(data={'Action': action_series, 'Quantity': quantity_series})
+    def __init__(self):
+        self.actions = pd.DataFrame()
         print('Strategy initialized.')
 
-    def reset_data(self, stock_data):
-        self.stock_data = stock_data
-
     def get_actions(self):
-        print('Actions sample\n--------')
-        print(self.actions.head(10))
-        print(self.actions.sample(10))
-        print(self.actions.tail(10))
         return self.actions
 
-    def strategize(self):
+    def strategize(self, portfolio=None, stock_data=None):
         print('Strategizing...')
+        index = pd.MultiIndex.from_product([stock_data.dates, stock_data.symbols], names=['Date', 'Stock'])
+        size = index.size
+        action_series = pd.Series([Action.EMPTY] * size, index=index,
+                                  dtype=pd.api.types.CategoricalDtype(categories=Action.ACTIONS))
+        quantity_series = pd.Series([0] * size, index=index, dtype='int')
+
+        self.actions = pd.DataFrame(data={'Action': action_series, 'Quantity': quantity_series})
         start_date = self.actions.index[0][0]
         end_date = self.actions.index[-1][0]
         self.actions['Action'] = [Action.HOLD] * self.actions['Action'].size
@@ -52,8 +44,8 @@ Bollinger Band Strategy will buy an inital set of stocks. If any come up through
  If anything goes down through the top band, sell
 """
 class BollingerBandStrategy(Strategy):
-    def __init__(self, stock_data=None):
-        super(self, stock_data)
+    def __init__(self):
+        super().__init__()
 
         print('Bollinger Band Strategy initialized.')
 
@@ -65,7 +57,12 @@ if __name__ == "__main__":
     dates = pd.date_range(start=start, end=end)
     stock_data = StockData(symbols, dates=dates)
 
-    strategy = Strategy(stock_data)
-    strategy.get_actions()
-    strategy.strategize()
-    strategy.get_actions()
+    strategy = Strategy()
+
+    strategy.strategize(stock_data=stock_data)
+    actions = strategy.get_actions()
+    print('Actions sample\n--------')
+    print(actions.head(10))
+    print(actions.tail(10))
+
+    bbs = BollingerBandStrategy()

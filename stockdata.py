@@ -8,6 +8,8 @@ class StockData:
     dates = pd.date_range(start, end)
     def __init__(self, symbols, dates=dates, windows=20, days_ahead=5):
         self.symbols = symbols
+        if 'SPY' not in self.symbols:
+            self.symbols.insert(0, 'SPY')
         self.dates = dates
         self.windows = windows
         self.days_ahead = days_ahead
@@ -24,7 +26,6 @@ class StockData:
         #self.outputs = self.adj_close.copy(deep=True)
         #print(self.features.shape)
         #print(self.outputs.shape)
-
 
 '''
     def get_training_data(self):
