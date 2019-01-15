@@ -42,8 +42,16 @@ class Portfolio:
         self._apply_transactions(strategy.get_transactions())
 
     def _apply_transactions(self, transactions):
-        print(transactions.head(5))
-        return
+        def transactions_to_quantity_and_price_changes(row):
+            new_row = row.map(lambda transaction: transaction.get_effect_on_quantity())
+            new_row['_CASH'] = row.map(lambda transaction: transaction.get_total_price()).sum()
+            return new_row
+        changes = transactions.apply(transactions_to_quantity_and_price_changes, axis=1)\
+            .cumsum()\
+            .resample('1D')\
+            .ffill()
+        self.allocations = self.allocations.add(changes, fill_value=None).dropna()
+        print(self.allocations)
 
 
 if __name__ == "__main__":

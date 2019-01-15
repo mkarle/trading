@@ -18,13 +18,13 @@ class Strategy:
     def get_transactions(self):
         return self.transactions
 
-    def strategize(self, portfolio=None, stock_data=None):
+    def strategize(self, stock_data=None):
         print('Strategizing...')
 
         start_date = stock_data.dates[0]
         end_date = stock_data.dates[-1]
         self.transactions = transaction.initialize_actions(dates=[start_date, end_date], symbols=stock_data.symbols)
-        
+
         self.transactions.loc[start_date, :] = stock_data.adj_close.loc[start_date, :]\
             .transform(lambda x: transaction.BuyTransaction(quantity=1, price=x))
         self.transactions.loc[end_date, :] = stock_data.adj_close.loc[end_date, :]\
