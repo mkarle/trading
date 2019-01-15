@@ -26,9 +26,9 @@ class Strategy:
         self.transactions = transaction.initialize_actions(dates=[start_date, end_date], symbols=stock_data.symbols)
 
         self.transactions.loc[start_date, :] = stock_data.adj_close.loc[start_date, :]\
-            .transform(lambda x: transaction.BuyTransaction(quantity=1, price=x))
+            .transform(lambda x: transaction.BuyTransaction(quantity=2, price=x))
         self.transactions.loc[end_date, :] = stock_data.adj_close.loc[end_date, :]\
-            .transform(lambda x: transaction.SellTransaction(quantity=1, price=x))
+            .transform(lambda x: transaction.SellTransaction(quantity=2, price=x))
         print('Finished strategizing')
 
 
