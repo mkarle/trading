@@ -16,14 +16,14 @@ if __name__ == "__main__":
     stock_data = StockData(symbols, dates=dates)
 
     strategy = Strategy(stock_data)
-    actions = strategy.get_actions()
+    actions = strategy.get_transactions()
     print('Actions sample\n--------')
     print(actions.head(10))
     print(actions.sample(10))
     print(actions.tail(10))
 
     strategy.strategize()
-    actions = strategy.get_actions()
+    actions = strategy.get_transactions()
     print('Actions sample\n--------')
     print(actions.head(10))
     print(actions.sample(10))

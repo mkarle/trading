@@ -4,10 +4,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from stockdata import StockData
 from strategy import Strategy
+import transaction
+from copy import deepcopy
+
+
+def func(x):
+    print(x)
+
 
 class Portfolio:
     CASH = '_CASH'
-    CLOSING_VALUE = '_C_VALUE'
 
     def __init__(self, initial_investment=1000, symbols=None, stock_data=None, dates=None):
         self.initial_investment = initial_investment
@@ -16,29 +22,32 @@ class Portfolio:
             self._init_with_stock_data(stock_data)
         else:
             self._init_without_stock_data(symbols, dates)
-        self.allocations[[Portfolio.CASH, Portfolio.CLOSING_VALUE]] = self.cash
+        self.allocations[[Portfolio.CASH]] = self.cash
 
     def _init_with_stock_data(self, stock_data):
-        columns = stock_data.symbols
-        columns.extend([Portfolio.CASH, Portfolio.CLOSING_VALUE])
+        columns = deepcopy(stock_data.symbols)
+        columns.extend([Portfolio.CASH])
         self.allocations = pd.DataFrame(index=stock_data.dates, columns=columns).fillna(value=0)
 
     def _init_without_stock_data(self, symbols, dates):
-        columns = ['SPY'] if symbols is None else symbols
-        columns.extend([Portfolio.CASH, Portfolio.CLOSING_VALUE])
+        columns = ['SPY'] if symbols is None else deepcopy(symbols)
+        columns.extend([Portfolio.CASH])
         dates = pd.date_range(start=dt.date.today().isoformat(), period=1) if dates is None else dates
         self.allocations = pd.DataFrame(index=dates, columns=columns).fillna(value=0)
 
     def optimize(self, strategy=None, stock_data=None):
-        strategy.strategize(self, stock_data)
-        self._apply_actions(strategy.get_actions(), stock_data)
+        assert strategy is not None, "Give me a real strategy."
 
-    def _apply_actions(self, actions, stock_data):
-        print(actions.index)
+        strategy.strategize(portfolio=self, stock_data=stock_data)
+        self._apply_transactions(strategy.get_transactions())
+
+    def _apply_transactions(self, transactions):
+        print(transactions.head(5))
+        return
 
 
 if __name__ == "__main__":
-    symbols = ['SPY']
+    symbols = ['SPY', 'AMZN']
     start = '2016-11-01'
     end = '2017-11-01'
     dates = pd.date_range(start=start, end=end)
